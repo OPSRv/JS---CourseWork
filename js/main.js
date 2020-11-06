@@ -13,9 +13,9 @@ data.then((data) => {
 });
 
 // smooth BODY
-// setTimeout(function(){
-// 	document.body.classList.add('body_visible');
-// }, 200);
+setTimeout(function(){
+	document.body.classList.add('body_visible');
+}, 200);
 
 // SCROLL
 window.onscroll = () => {
@@ -28,9 +28,8 @@ window.onscroll = () => {
   }
 };
 // UP_TOP
-let time;
-
 function up() {
+  let time;
   let top = Math.max(
     document.body.scrollTop,
     document.documentElement.scrollTop
@@ -41,10 +40,7 @@ function up() {
   } else clearTimeout(time);
   return false;
 }
-document
-  .querySelector(".up_top")
-  .addEventListener("click", function (scrolled) {
-    console.log("sdfsdf" + scrolled);
+document.querySelector(".up_top").addEventListener("click", function (scrolled) {
     up();
   });
 // SEARCH
@@ -74,19 +70,54 @@ function dynamicInput() {
 }
 
 function dynamicKey() {
-  dynamic_input.addEventListener("keydown", () => {
+  dynamic_input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      console.log(dynamic_input.value);
+      searchData = encodeURI(dynamic_input.value)
+      console.log(searchData)
+      let dataSearch = new Promise((resolve, reject) => {
+        fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=05fd01b946415245871999e682addb43&language=ru-RU&query=${searchData}&page=1&include_adult=false`
+        ).then((dataSearch) => {
+          resolve(dataSearch.json());
+        });
+      });
+      dataSearch.then((dataSearch) => {
+        let resultSearch = dataSearch;
+        showResultSearch(resultSearch);
+      });
     }
   });
 }
 dynamicInput();
-
+let small_menu = document.querySelector(".small_menu");
 // burgerMenu'
 let burger_container = document.querySelector(".container");
-burger_container.addEventListener("click", () => {
+burger_container.addEventListener("click", (event) => {
   burger_container.classList.toggle("change");
+  small_menu.classList.toggle("header_close");
+  ul.classList.toggle("dbl-border");
+  ul.classList.toggle("none");
 });
+window.addEventListener("resize", function () {
+  if (small_menu.classList.contains("header_close") && innerWidth > 768) {
+    burger_container.classList.remove("change");
+    small_menu.classList.toggle("header_close");
+    ul.classList.toggle("dbl-border");
+    ul.classList.toggle("none");
+  }
+});
+
+  let div = document.querySelector('.small_menu');
+  let ul = document.createElement('ul');
+  div.appendChild(ul);
+  ul.classList.add('none')
+  ul.innerHTML = `
+    <li><a href="#">Головна</a></li>
+    <li><a href="#">Новинки</a></li>
+    <li><a href="#">Категорії</a></li>
+    <li><a href="#">Пошук</a></li>
+    `;
+
 
 class Slider {
   constructor(result) {
@@ -111,24 +142,19 @@ class Slider {
         <div class = "text_slider_inner">
           <span class="text_slider slider__title" data-index = '${i}'>${this.result.results[i].title}</span>
           <span class="text_slider slider__overview" data-index = '${i}'>${this.result.results[i].overview}</span> 
-        </div>
-          `;
-
+        </div>`;
     }
 
     let img_true_slider = document.querySelectorAll(".img_true_slider");
     let slider__title = document.querySelectorAll(".slider__title");
     let slider__overview = document.querySelectorAll(".slider__overview");
-    img_true_slider[0].classList.add("block");
-    slider__title[0].classList.add("block");
-    slider__overview[0].classList.add("block");
-
-
     let prev_next = document.querySelector(".prev_next");
     let prev_back = document.querySelector(".prev_back");
     let i = 0;
-
-    prev_next.addEventListener("click", function () {
+    img_true_slider[0].classList.add("block");
+    slider__title[0].classList.add("block");
+    slider__overview[0].classList.add("block");
+    prev_next.addEventListener("click", function next() {
       ++i;
       if (i >= img_true_slider.length) {
         img_true_slider[i - 1].classList.remove("block");

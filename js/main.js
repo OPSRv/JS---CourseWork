@@ -13,8 +13,8 @@ data.then((data) => {
 });
 
 // smooth BODY
-setTimeout(function(){
-	document.body.classList.add('body_visible');
+setTimeout(function () {
+  document.body.classList.add("body_visible");
 }, 200);
 
 // SCROLL
@@ -40,58 +40,16 @@ function up() {
   } else clearTimeout(time);
   return false;
 }
-document.querySelector(".up_top").addEventListener("click", function (scrolled) {
+document
+  .querySelector(".up_top")
+  .addEventListener("click", function (scrolled) {
     up();
   });
-// SEARCH
-let search = document.querySelector(".search");
-let list_search = document.querySelector(".list_search");
-search.addEventListener("click", () => {
-  list_search.classList.toggle("list_search");
-  dynamic_input.focus();
-  dynamicInputScreen();
-});
 
-// SEARCH
-let dynamic_input = document.querySelector("#dynamic_label_input");
-function dynamicInputScreen() {
-  dynamic_input.addEventListener("blur", (event) => {
-    event.preventDefault();
-    dynamic_input.blur();
-    list_search.classList.add("list_search");
-    dynamic_input.value = "";
-  });
-}
-// INPUT => SEARCH
-function dynamicInput() {
-  dynamic_input.addEventListener("input", () => {
-    dynamicKey();
-  });
-}
-
-function dynamicKey() {
-  dynamic_input.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      searchData = encodeURI(dynamic_input.value)
-      console.log(searchData)
-      let dataSearch = new Promise((resolve, reject) => {
-        fetch(
-          `https://api.themoviedb.org/3/search/movie?api_key=05fd01b946415245871999e682addb43&language=ru-RU&query=${searchData}&page=1&include_adult=false`
-        ).then((dataSearch) => {
-          resolve(dataSearch.json());
-        });
-      });
-      dataSearch.then((dataSearch) => {
-        let resultSearch = dataSearch;
-        showResultSearch(resultSearch);
-      });
-    }
-  });
-}
-dynamicInput();
-let small_menu = document.querySelector(".small_menu");
 // burgerMenu'
+let small_menu = document.querySelector(".small_menu");
 let burger_container = document.querySelector(".container");
+let signin = document.querySelector("#signin");
 burger_container.addEventListener("click", (event) => {
   burger_container.classList.toggle("change");
   small_menu.classList.toggle("header_close");
@@ -107,17 +65,86 @@ window.addEventListener("resize", function () {
   }
 });
 
-  let div = document.querySelector('.small_menu');
-  let ul = document.createElement('ul');
-  div.appendChild(ul);
-  ul.classList.add('none')
-  ul.innerHTML = `
+let div = document.querySelector(".small_menu");
+let ul = document.createElement("ul");
+div.appendChild(ul);
+ul.classList.add("none");
+ul.innerHTML = `
     <li><a href="#">Головна</a></li>
     <li><a href="#">Новинки</a></li>
     <li><a href="#">Категорії</a></li>
-    <li><a href="#">Пошук</a></li>
     `;
 
+let btn_search = document.querySelector("#btn_search");
+let input_search = document.querySelector("#user");
+input_search.addEventListener("change", (event) => {
+  let input_value = event.target.value;
+  showResultSearch(input_value);
+});
+btn_search.addEventListener("click", function (key) {
+  key.preventDefault();
+});
+// SEARCH
+
+async function showResultSearch(input_value = "пес") {
+  if (input_value != undefined) {
+    input_value = encodeURI(input_value);
+    let page_count = 1;
+    let response = await fetch(
+      `https://api.themoviedb.org/3/search/movie?api_key=05fd01b946415245871999e682addb43&language=ru-RU&query=${input_value}&page=${page_count}&include_adult=false`
+    );
+    let result_search = await response.json();
+    // result_pages = result_search.results;
+    console.log(result_search);
+    total_pages = result_search.total_pages;
+    // let all_pages = [];
+    // // для прикладу 5 - має бути змінна - total_pages
+    // for (let i = 1; i <= 5; i++) {
+    //   let get_all_page = await fetch(
+    //     `https://api.themoviedb.org/3/search/movie?api_key=05fd01b946415245871999e682addb43&language=ru-RU&query=${input_value}&page=${i}&include_adult=false`
+    //   );
+    //   let result_get_all_page = await get_all_page.json();
+    //   all_pages.push(result_get_all_page.results);
+    // }
+    showSearch(result_search);
+  }
+}
+
+showResultSearch();
+
+class Search {
+  constructor(result_search) {
+    this.resultSearch = result_search;
+    this.total_pages = total_pages;
+    // this.title = result_search.results.title;
+    // this.overview = result_search.results.overview;
+    // this.poster_path = result_search.results.poster_path;
+    // this.release_date = result_search.results.release_date;
+    // this.vote_average = result_search.results.vote_average;
+  }
+  view() {
+    // let search_movie = document.querySelector(".search_movie");
+    let wrapper_movie = document.querySelector(".wrapper_movie");
+    let pages = document.querySelector(".pages");
+    let movie_cart = document.createElement("div");
+    movie_cart.classList.add("movie_cart");
+    wrapper_movie.insertAdjacentElement("afterbegin", movie_cart);
+    console.log(this.resultSearch);
+
+    for (let i = 0; i < this.total_pages; i++) {
+      let pages_num = i + 1;
+      console.log(pages_num);
+      pages.innerHTML += `
+      <span class='pages_num' data-set=${pages_num}>${pages_num}&emsp;</span>
+      `;
+    }
+    let pages_num = document.querySelectorAll(".pages_num");
+    for (let j = 0; j < pages_num.length; j++)
+      pages_num[j].addEventListener("click", (event) => {
+        console.log(event.target.dataset.set);
+      });
+  }
+}
 
 class Slider {
   constructor(result) {
@@ -265,4 +292,8 @@ let div__ImgCart = document.querySelectorAll(".div__ImgCart");
 function showResult(result) {
   let sliderTop = new Slider(result).slider();
   let topFilm = new ImagesTop("cart__All", result).print();
+}
+
+function showSearch(result_search) {
+  let search_view = new Search(result_search).view();
 }

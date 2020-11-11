@@ -2,6 +2,7 @@ class Search {
   constructor() {
     this.input_user = document.querySelector("#user");
     this.input_search = document.querySelector("#signin");
+
     this.input_search.addEventListener("submit", (e) => {
       e.preventDefault();
       let input = this.input_user.value;
@@ -35,6 +36,7 @@ class Search {
         let first_promise = await promise.results;
         let total_pages = await promise.total_pages;
         await this.createFirstPages(first_promise, total_pages);
+        await this.allPage(count_page, total_pages);
       } else {
         console.log("input = undefined");
         return this;
@@ -47,7 +49,6 @@ class Search {
 
   async createFirstPages(first_promise, total_pages) {
     try {
-      console.log(first_promise, total_pages);
       let search_card = document.createElement("div");
       let wrapper_movie = document.querySelector(".wrapper_movie");
       wrapper_movie.insertAdjacentElement("beforeend", search_card);
@@ -114,40 +115,38 @@ class Search {
       let pages = document.createElement("div");
       pages.classList.add("pages");
       search_movie.insertAdjacentElement("beforeend", pages);
-      console.log(total_pages);
 
       for (let k = 0; k < total_pages; k++) {
         let iter = k + 1;
         pages.innerHTML += `<span class='pages_span' data-set=${iter}>${iter}&emsp;</span>`;
       }
+
       let pages_span = document.querySelectorAll(".pages_span");
+      for (let g = 0; g < pages_span.length; g++) {
+        pages_span[g].addEventListener("click", () => {
+          let count_page = pages_span[g].dataset.set;
+          this.allPage(count_page, total_pages);
+        });
+      }
       let close_search = document.querySelector("#close_search");
       close_search.addEventListener("click", () => {
         wrapper_movie.innerHTML = " ";
         pages.innerHTML = " ";
       });
-      await this.allPage(pages_span);
     } catch (err) {
       console.log("input_event - ", err);
       return this;
     }
+    return total_pages;
   }
 
-  async allPage(pages_span) {
-    await this.pages_span.addEventListener("click", () => {
-      console.log(pages_span);
-    });
-
-    //
-    //   pages_span.addEventListener("click", () => {
-    //       await this.allPage(pages_span)
-    //   });
+  async allPage(count_page, total_pages) {
+    await count_page, total_pages;
   }
 }
 
 function inputview() {
   let input_view = new Search().input_event();
 }
-
 inputview();
 // this.url = `https://api.themoviedb.org/3/search/movie?api_key=05fd01b946415245871999e682addb43&language=ru-RU&query=${this.input_value}&page=${this.selected_page}&include_adult=false`;

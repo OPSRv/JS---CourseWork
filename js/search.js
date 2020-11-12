@@ -8,11 +8,13 @@ class Search {
       let input = this.input_user.value;
       input = encodeURI(input);
       this.input_event(input);
+      console.log(input)
       return this;
     });
     this.pages = document.querySelectorAll(".pages_span");
 
     this.movie_card = new Object();
+    return this;
   }
 
   // this.search_result = search_result;
@@ -25,7 +27,7 @@ class Search {
   //   release_date,
   //   vote_average,
 
-  async input_event(input) {
+  async input_event(input, url) {
     try {
       let wrapper_movie = document.querySelector(".wrapper_movie");
       wrapper_movie.innerHTML = " ";
@@ -35,20 +37,20 @@ class Search {
         let promise = await response.json();
         let first_promise = await promise.results;
         let total_pages = await promise.total_pages;
-        await this.createFirstPages(first_promise, total_pages);
-        await this.allPage(count_page, total_pages);
+        let all_pages = await promise;
+        await this.createFirstPages(first_promise, total_pages,all_pages, input)
       } else {
         console.log("input = undefined");
-        return this;
       }
     } catch (err) {
       console.log("input_event - ", err);
-      return this;
     }
   }
 
-  async createFirstPages(first_promise, total_pages) {
+  async createFirstPages(first_promise, total_pages, all_pages, input) {
     try {
+      console.log("createFirstPages")
+      console.log(first_promise, total_pages, all_pages)
       let search_card = document.createElement("div");
       let wrapper_movie = document.querySelector(".wrapper_movie");
       wrapper_movie.insertAdjacentElement("beforeend", search_card);
@@ -92,6 +94,35 @@ class Search {
         }
         wraper_img[i].insertAdjacentElement("afterbegin", images_poster_path);
       }
+
+      let pages = document.createElement("div");
+      pages.classList.add("pages");
+  
+        for (let k = 0; k < total_pages; k++) {
+          let iter = k + 1;
+          pages.innerHTML += `<span class='pages_span' data-set=${iter}>${iter}&emsp;</span>`;
+        }
+        let close_search = document.querySelector("#close_search");
+        close_search.addEventListener("click", () => {
+          wrapper_movie.innerHTML = " ";
+          pages.innerHTML = " ";
+        });
+        let search_movie = document.querySelector(".search_movie");
+        search_movie.insertAdjacentElement("beforeend", pages);
+
+        let pages_span = document.querySelectorAll(".pages_span");
+        console.log(pages_span)
+          for (let g = 0; g < pages_span.length; g++) {
+            pages_span[g].addEventListener("click", () => {
+              let count_page = pages_span[g].dataset.set;
+              console.log(count_page);
+              wrapper_movie.innerHTML = " ";
+              pages.innerHTML = " ";
+              let url_2 = `https://api.themoviedb.org/3/search/movie?api_key=05fd01b946415245871999e682addb43&language=ru-RU&query=${input}&page=${count_page}&include_adult=false`;
+              this.input_event(input, url_2);
+            });
+          }
+          
       let circre__info = document.querySelectorAll(".circre__info");
       let card__text = document.querySelectorAll(".card__text");
       let overview = document.querySelectorAll(".overview");
@@ -110,38 +141,9 @@ class Search {
           overview[j].style.transition = "2s";
         });
       }
-
-      let search_movie = document.querySelector(".search_movie");
-      let pages = document.createElement("div");
-      pages.classList.add("pages");
-      search_movie.insertAdjacentElement("beforeend", pages);
-
-      for (let k = 0; k < total_pages; k++) {
-        let iter = k + 1;
-        pages.innerHTML += `<span class='pages_span' data-set=${iter}>${iter}&emsp;</span>`;
-      }
-
-      let pages_span = document.querySelectorAll(".pages_span");
-      for (let g = 0; g < pages_span.length; g++) {
-        pages_span[g].addEventListener("click", () => {
-          let count_page = pages_span[g].dataset.set;
-          this.allPage(count_page, total_pages);
-        });
-      }
-      let close_search = document.querySelector("#close_search");
-      close_search.addEventListener("click", () => {
-        wrapper_movie.innerHTML = " ";
-        pages.innerHTML = " ";
-      });
     } catch (err) {
-      console.log("input_event - ", err);
-      return this;
+      console.log("createFirstPages - ", err);
     }
-    return total_pages;
-  }
-
-  async allPage(count_page, total_pages) {
-    await count_page, total_pages;
   }
 }
 

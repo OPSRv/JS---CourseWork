@@ -57,12 +57,12 @@ header {
 }
 
 .header_close {
-  height: 180px;
+  height: 60px;
   width: 100%;
   background: rgba(44, 44, 44, 0.884);
   position: absolute;
   top: 110px;
-  transition: 0.1s;
+  transition: 0.2s;
 }
 
 .dbl-border {
@@ -105,7 +105,7 @@ header .logo__img {
 
 .movie_logo {
   font-size: 1.4rem;
-  font-family: "Jura", sans-serif;
+  font-family: 'Underdog';
   font-weight: bold;
   position: absolute;
   top: 53px;
@@ -169,6 +169,10 @@ header .logo__img {
   background-color: rgb(194, 194, 194);
   margin: 6px 0;
   transition: 0.4s;
+}
+
+.burger:hover {
+  background-color: rgb(154, 216, 255);
 }
 
 .change .bar1 {
@@ -277,7 +281,6 @@ header .logo__img {
   padding-left: 9px;
   padding-bottom: 3px;
   text-align: center;
-  font-family: "Jura", sans-serif;
 }
 
 #signin button[type="submit"]:hover {
@@ -289,8 +292,9 @@ header .logo__img {
 .result_search {
   color: #fff;
   font-family: "Jura", sans-serif;
-  font-size: 24px;
+  font-size: 0;
   padding: 5px 0 5px 0;
+  transition: 1s;
 }
 
 .close_circle {
@@ -304,9 +308,10 @@ header .logo__img {
   border: red;
 }
 
+
 .search_movie {
   width: 100%;
-  height: 100%;
+  height: 0;
   background: #575757af;
   z-index: 3;
   display: flex;
@@ -314,6 +319,7 @@ header .logo__img {
   align-items: center;
   flex-flow: column nowrap;
   padding: 0;
+  transition: .5s;
 }
 
 .wrapper_movie {
@@ -382,6 +388,13 @@ header .logo__img {
 
 .img_true_slider {
   border-radius: 20px;
+  overflow: hidden;
+}
+
+.img_true_slider:hover {
+  filter: contrast(80%);
+  blur(1px);
+  transform: scale(1.02);
 }
 
 .text_slider {
@@ -389,6 +402,11 @@ header .logo__img {
   display: flex;
   flex-flow: column wrap;
   padding-top: 0px;
+  z-index: 100;
+}
+
+.text_slider:hover {
+  color: #bdbdbd;
 }
 
 .slider__title {
@@ -413,6 +431,11 @@ header .logo__img {
   padding: 10px;
   text-align: left;
   line-height: 21px;
+  transition: 1s;
+}
+
+.slider__overview:hover {
+  opacity: .5;
 }
 
 .btn_slider_nav {
@@ -631,9 +654,9 @@ header .logo__img {
   color: #fff;
 }
 
-/* .items_footer {
-  width: 100%;
-} */
+.copyright {
+  font-family: "Jura", sans-serif;
+}
 
 .up_top {
   position: fixed;
@@ -710,6 +733,8 @@ header .logo__img {
     display: inline-block;
     position: relative;
   }
+
+
 
   .slider__title {
     margin-top: 5px;

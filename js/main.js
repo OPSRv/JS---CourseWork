@@ -71,8 +71,6 @@ div.appendChild(ul);
 ul.classList.add("none");
 ul.innerHTML = `
     <li><a href="#">Головна</a></li>
-    <li><a href="#">Новинки</a></li>
-    <li><a href="#">Категорії</a></li>
     `;
 
 class Slider {
@@ -97,7 +95,7 @@ class Slider {
       text_slider.innerHTML += `
         <div class = "text_slider_inner">
           <span class="text_slider slider__title" data-index = '${i}'>${this.result.results[i].title}</span>
-          <span class="text_slider slider__overview" data-index = '${i}'>${this.result.results[i].overview}</span> 
+          <span class="slider__overview" data-index = '${i}'>${this.result.results[i].overview}</span> 
         </div>`;
     }
 
@@ -217,6 +215,144 @@ class ImagesTop {
 let inform = document.querySelector(".inform");
 let topSide = document.querySelector(".topSide");
 let div__ImgCart = document.querySelectorAll(".div__ImgCart");
+
+class Search {
+  constructor() {
+    this.input_user = document.querySelector("#user");
+    this.input_search = document.querySelector("#signin");
+    let count = 0;
+    this.input_search.addEventListener("submit", (e) => {
+      e.preventDefault();
+      count += 1;
+      let search_movie = document.querySelector(".search_movie");
+      search_movie.style.height = "100%";
+      search_movie.innerHTML = `
+      <div class="close_circle">
+        <i class="fas fa-times-circle" class="close" id="close_search"></i>
+      </div>
+      <span class="result_search">Результати пошуку</span>
+      <div class="wrapper_movie"></div>
+    `;
+      let result_search = document.querySelector(".result_search");
+      result_search.style.fontSize = "24px";
+      if (count < 1) {
+        search_movie.innerHTML = " ";
+      }
+      let input = this.input_user.value;
+      if (input == "") {
+        input = "new";
+      }
+      input = encodeURI(input);
+      this.input_event(input);
+      count = 0;
+    });
+    this.movie_card = new Object();
+    return this;
+  }
+
+  async input_event(input) {
+    try {
+      if (input == undefined) {
+        input = "";
+      } else if (input != undefined) {
+        let url = `https://api.themoviedb.org/3/search/movie?api_key=05fd01b946415245871999e682addb43&language=ru-RU&query=${input}&include_adult=false`;
+        let response = await fetch(url);
+        let promise = await response.json();
+        let first_promise = await promise.results;
+        let total_pages = await promise.total_pages;
+        let all_pages = await promise;
+        await this.createFirstPages(first_promise, total_pages);
+      } else {
+        console.log("input = undefined");
+      }
+    } catch (err) {
+      console.log("input_event - ", err);
+    }
+  }
+
+  async createFirstPages(first_promise, total_pages) {
+    try {
+      console.log("createFirstPages");
+      let search_card = document.createElement("div");
+      let wrapper_movie = document.querySelector(".wrapper_movie");
+      wrapper_movie.insertAdjacentElement("beforeend", search_card);
+      search_card.classList.add(`search_card`);
+      for (let i = 0; i < first_promise.length; i++) {
+        this.movie_card = {
+          title: first_promise[i].title,
+          overview: first_promise[i].overview,
+          poster_path: first_promise[i].poster_path,
+          release_date: first_promise[i].release_date,
+          vote_average: first_promise[i].vote_average,
+        };
+        search_card.innerHTML += `
+                <div class = 'div__ImgCart item'>
+                <div class = "overview display__none"><span>
+                ${first_promise[i].overview}<span></div>
+                <i class="fas fa-info-circle circre__info"></i>
+                  <div class = 'div_img' id='wraper_img'>
+                  </div>
+                  <div class = 'card__text'>
+                  <span id = 'title'>${first_promise[i].title}</span>
+                    <div class = 'releaseVote'>
+                      <span id = 'release_date'>Дата релізу : ${first_promise[i].release_date}</span><br>
+                      <span id = 'vote_average'>Рейтинг : ${first_promise[i].vote_average}</span>
+                    </div>
+                  </div>
+                </div>
+                `;
+        let wraper_img = document.querySelectorAll("#wraper_img");
+        let images_poster_path = document.createElement("img");
+
+        if (this.movie_card.poster_path == null) {
+          images_poster_path.setAttribute("src", "./img/none.jpg");
+        } else {
+          images_poster_path.setAttribute(
+            "src",
+            `https://image.tmdb.org/t/p/w200${first_promise[i].poster_path}`
+          );
+        }
+        wraper_img[i].insertAdjacentElement("afterbegin", images_poster_path);
+      }
+
+      let circre__info = document.querySelectorAll(".circre__info");
+      let card__text = document.querySelectorAll(".card__text");
+      let overview = document.querySelectorAll(".overview");
+
+      for (let j = 0; j < circre__info.length; j++) {
+        circre__info[j].addEventListener("mouseover", () => {
+          card__text[j].style.opacity = ".1";
+          overview[j].style.opacity = "1";
+          overview[j].classList.toggle("display__none");
+          overview[j].style.transition = "2s";
+        });
+        overview[j].addEventListener("mouseout", () => {
+          overview[j].classList.toggle("display__none");
+          overview[j].style.opacity = "0";
+          card__text[j].style.opacity = "1";
+          overview[j].style.transition = "2s";
+        });
+      }
+
+      let close_search = document.querySelector("#close_search");
+      close_search.addEventListener("click", () => {
+        wrapper_movie.innerHTML = " ";
+        console.log("close");
+        let search_movie = document.querySelector(".search_movie");
+        search_movie.style.height = "0";
+        let result_search = document.querySelector(".result_search");
+        result_search.style.fontSize = "0px";
+      });
+    } catch (err) {
+      console.log("createFirstPages - ", err);
+    }
+  }
+}
+
+function inputview() {
+  let input_view = new Search().input_event();
+}
+inputview();
 
 function showResult(result) {
   let sliderTop = new Slider(result).slider();
